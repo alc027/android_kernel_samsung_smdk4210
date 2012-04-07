@@ -36,7 +36,7 @@
 #define LULZACTIVE_AUTHOR	"tegrak"
 
 // if you changed some codes for optimization, just write your name here.
-#define LULZACTIVE_TUNER "siyah"
+#define LULZACTIVE_TUNER "netchip"
 
 #define LOGI(fmt...) printk(KERN_INFO "[lulzactive] " fmt)
 #define LOGW(fmt...) printk(KERN_WARNING "[lulzactive] " fmt)
@@ -75,7 +75,7 @@ static struct mutex set_speed_lock;
 /*
  * The minimum amount of time to spend at a frequency before we can step up.
  */
-#define DEFAULT_UP_SAMPLE_TIME 20 * USEC_PER_MSEC
+#define DEFAULT_UP_SAMPLE_TIME 18 * USEC_PER_MSEC
 static unsigned long up_sample_time;
 
 /*
@@ -83,6 +83,12 @@ static unsigned long up_sample_time;
  */
 #define DEFAULT_DOWN_SAMPLE_TIME 40 * USEC_PER_MSEC
 static unsigned long down_sample_time;
+
+/*
+ * The max amount of time the Exynos SoC could handle before pumping up
+ */
+#define CPU_MAX 10 * USEC_PER_MSEC
+static unsigned long cpu_max;
 
 /*
  * DEBUG print flags
@@ -100,7 +106,7 @@ enum {
 /*
  * CPU freq will be increased if measured load > inc_cpu_load;
  */
-#define DEFAULT_INC_CPU_LOAD 60
+#define DEFAULT_INC_CPU_LOAD 50
 static unsigned long inc_cpu_load;
 
 /*
@@ -746,6 +752,8 @@ static struct global_attr down_sample_time_attr = __ATTR(down_sample_time, 0666,
 static ssize_t show_up_sample_time(struct kobject *kobj,
 				struct attribute *attr, char *buf)
 {
+	if(up_sample_time < cpu_max)
+	  up_sample_time = cpu_max;
 	return sprintf(buf, "%lu\n", up_sample_time);
 }
 
@@ -753,6 +761,8 @@ static ssize_t store_up_sample_time(struct kobject *kobj,
 			struct attribute *attr, const char *buf, size_t count)
 {
 	if(strict_strtoul(buf, 0, &up_sample_time)==-EINVAL) return -EINVAL;
+	if(up_sample_time < cpu_max)
+	  up_sample_time = cpu_max;
 	return count;
 }
 
@@ -1091,6 +1101,7 @@ void stop_lulzactive(void)
 static int __init cpufreq_lulzactive_init(void)
 {
 
+	cpu_max = CPU_MAX;
 	up_sample_time = DEFAULT_UP_SAMPLE_TIME;
 	down_sample_time = DEFAULT_DOWN_SAMPLE_TIME;
 	debug_mode = DEFAULT_DEBUG_MODE;
