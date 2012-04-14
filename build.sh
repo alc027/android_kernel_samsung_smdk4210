@@ -23,7 +23,7 @@ setup ()
     fi
 
     export USE_SEC_FIPS_MODE=true
-    CROSS_PREFIX="$ANDROID_BUILD_TOP/prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi-"
+    CROSS_PREFIX="$ANDROID_BUILD_TOP/prebuilt/linux-x86/toolchain/linaro/bin/arm-eabi-"
 }
 
 build ()
