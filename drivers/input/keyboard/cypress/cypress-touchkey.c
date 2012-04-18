@@ -83,7 +83,7 @@ int screen_on = 1;
 int notification_timeout = -1;  /* never time out */
 #ifdef CONFIG_TARGET_CM_KERNEL
 int led_on = 0;
-int led_timeout = BL_ALWAYS_ON; /* never time out */
+int led_timeout = DISABLE_BL /* never time out */
 int notification_enabled = -1;  /* disabled by default */
 #else
 int led_on = -1;
